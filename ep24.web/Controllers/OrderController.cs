@@ -24,7 +24,7 @@ namespace ep24.web.Controllers
         [HttpGet]
         public IEnumerable<Order> ListHistory()
         {
-            //TODO: implement scenario ขอรายการสั่งซื้อจากรหัสอ้างอิง
+            //TODO: implement scenario ขอรายการสั่งซื้อที่ยืนยันรายการสั่งซื้อแล้ว
             throw new NotImplementedException();
         }
 
