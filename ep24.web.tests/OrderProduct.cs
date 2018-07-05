@@ -93,45 +93,5 @@ namespace mix_coffeeshop_web_test
             response.ReferenceCode.Should().BeNullOrEmpty();
             response.Message.Should().Be(expectedMessage);
         }
-
-        public static IEnumerable<object[]> OrderProductsSuccessData = new List<object[]>{
-            new object[] { new OrderProductRequest { OrderedProducts = new Dictionary<int, int> { { 1, 1 }, { 2, 1 }, }, Username = "john-doe@gmail.com", }, "สั่งเมนูสำเร็จ กรุณาชำระเงินที่เค้าเตอร์" },
-            new object[] { new OrderProductRequest { OrderedProducts = new Dictionary<int, int> { { 1, 1 }, { 3, 2 }, }, Username = "john-doe@gmail.com", }, "สั่งเมนูสำเร็จ กรุณาชำระเงินที่เค้าเตอร์" },
-            new object[] { new OrderProductRequest { OrderedProducts = new Dictionary<int, int> { { 1, 1 }, { 4, 2 }, }, Username = "john-doe@gmail.com", }, "สั่งเมนูสำเร็จ กรุณาชำระเงินที่เค้าเตอร์" },
-        };
-        [Theory(DisplayName = "สั่งเมนูสำเร็จ ให้แจ้งกลับว่า 'สั่งเมนูสำเร็จ กรุณาชำระเงินที่เค้าเตอร์' พร้อมกับ ReferenceCode")]
-        [MemberData(nameof(OrderProductsSuccessData))]
-        public void OrderProductsSuccess(OrderProductRequest data, string expectedMessage)
-        {
-            var mock = new MockRepository(MockBehavior.Default);
-            var repoProduct = mock.Create<IProductRepository>();
-            var repoOrder = mock.Create<IOrderRepository>();
-            var api = new OrderController(repoProduct.Object, repoOrder.Object);
-            repoProduct.Setup(it => it.GetAllProducts()).Returns(() => new List<Product>
-            {
-                new Product { Id = 1, Stock = 4, HasStock = true },
-                new Product { Id = 2, Stock = 5, HasStock = true },
-                new Product { Id = 3, Stock = 6, HasStock = true },
-                new Product { Id = 4, Stock = 0, HasStock = false },
-            });
-            repoOrder.Setup(it => it.Create(It.IsAny<Order>()));
-
-            var response = api.OrderProduct(data);
-
-            repoProduct.Verify(dac => dac.GetAllProducts(), Times.Once);
-            repoProduct.VerifyNoOtherCalls();
-            Func<Order, bool> func = o =>
-            {
-                o.Id.Should().NotBeNullOrEmpty();
-                o.Username.Should().NotBeNullOrEmpty();
-                o.OrderedProducts.Any();
-                o.ReferenceCode.Should().NotBeNullOrEmpty();
-                return true;
-            };
-            repoOrder.Verify(dac => dac.Create(It.Is<Order>(o => func(o))), Times.Once);
-            repoOrder.VerifyNoOtherCalls();
-            response.ReferenceCode.Should().NotBeNull();
-            response.Message.Should().Be(expectedMessage);
-        }
     }
 }

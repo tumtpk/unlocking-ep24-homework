@@ -56,8 +56,7 @@ namespace ep24.web.Controllers
             };
             orderRepo.Create(order);
             
-            //TODO: implement scenario สั่งเมนูสำเร็จ ให้แจ้งกลับว่า 'สั่งเมนูสำเร็จ กรุณาชำระเงินที่เค้าเตอร์' พร้อมกับ ReferenceCode
-            throw new NotImplementedException();
+            return new OrderProductResponse { Message = "สั่งเมนูสำเร็จ กรุณาชำระเงินที่เค้าเตอร์", ReferenceCode = order.ReferenceCode, };
         }
     }
 }
