@@ -24,8 +24,10 @@ namespace ep24.web.Controllers
         [HttpGet]
         public IEnumerable<Order> ListHistory()
         {
-            //TODO: implement scenario ขอรายการสั่งซื้อที่ยืนยันรายการสั่งซื้อแล้ว
-            throw new NotImplementedException();
+             //TODO: implement scenario ขอรายการสั่งซื้อที่ยืนยันรายการสั่งซื้อแล้ว
+            var order =  orderRepo.List(x=>x.PaidDate.HasValue);
+            return order;
+            //throw new NotImplementedException();
         }
 
         [HttpPost]
@@ -33,9 +35,17 @@ namespace ep24.web.Controllers
         {
             //TODO: implement scenario ไม่มีข้อมูล หรือไม่เลือกสินค้าที่จะสั่ง ให้แจ้งกลับว่า 'ไม่พบเมนูที่จะสั่ง' และไม่บันทึกข้อมูล
 
-            var productIds = request.OrderedProducts.Select(p => p.Key);
+
+            if (request == null || request.OrderedProducts == null ||request.OrderedProducts.Count() <=0  )
+            {
+                return new OrderProductResponse { Message = "ไม่พบเมนูที่จะสั่ง", };
+            }
+
+
+            var productIds = request.OrderedProducts.Select(p => p.Key);            
             var products = productRepo.GetAllProducts();
             var filteredProducts = products.Where(p => productIds.Contains(p.Id)).ToList();
+        
             if (filteredProducts.Count() != productIds.Count())
             {
                 return new OrderProductResponse { Message = "ไม่พบสินค้าบางรายการ กรุณาสั่งใหม่อีกครั้ง", };
